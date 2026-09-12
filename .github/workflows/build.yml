@@ -143,8 +143,12 @@ jobs:
       - name: 加载平台 defconfig + 开启 Loop/F2FS
         working-directory: kernel
         run: |
-          cp arch/arm64/configs/xaga.config arch/arm64/configs/xaga_defconfig
-          make ARCH=arm64 xaga_defconfig
+          # 加载基础配置
+          make ARCH=arm64 defconfig
+
+          # 合并xaga.config
+          ./scripts/kconfig/merge_config.sh .config arch/arm64/configs/xaga.config
+          
           ./scripts/config --set-val CONFIG_BLK_DEV_LOOP y
           ./scripts/config --set-val CONFIG_F2FS_FS y
           ./scripts/config --set-val CONFIG_F2FS_FS_SECURITY y
