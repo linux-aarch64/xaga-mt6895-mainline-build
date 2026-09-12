@@ -64,7 +64,7 @@ jobs:
   kernel:
     name: 编译主线内核
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 120
     if: ${{ github.event.inputs.TASK != '仅构建RootFS' }}
     steps:
       - name: Checkout 本仓库(获取bot.py等工具)
