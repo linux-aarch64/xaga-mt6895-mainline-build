@@ -64,7 +64,7 @@ jobs:
   kernel:
     name: 编译主线内核
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     if: ${{ github.event.inputs.TASK != '仅构建RootFS' }}
     steps:
       - name: Checkout 本仓库(获取bot.py等工具)
@@ -154,6 +154,9 @@ jobs:
           ./scripts/config --set-val CONFIG_F2FS_FS_SECURITY y
           # 关闭 CONFIG_WERROR，避免驱动警告导致编译失败
           ./scripts/config --disable CONFIG_WERROR
+          # 关闭 komeda 显示模块(似乎是用不上?)
+          ./scripts/config --disable CONFIG_DRM_KOMEDA
+          
           make ARCH=arm64 olddefconfig
 
       - name: 全 LLVM 编译内核 (作者强制规范)
