@@ -156,6 +156,12 @@ jobs:
           ./scripts/config --disable CONFIG_WERROR
           # 关闭 komeda 显示模块(似乎是用不上?)
           ./scripts/config --disable CONFIG_DRM_KOMEDA
+
+          # 补上缺失的音频和面板配置
+          ./scripts/config --set-val CONFIG_DRM_MEDIATEK y
+          ./scripts/config --set-val CONFIG_MTK_DRM_PANEL y
+          ./scripts/config --set-val CONFIG_MTK_DISP_DDIC y
+          ./scripts/config --set-val CONFIG_MTK_DISP_DRIVER y
           
           make ARCH=arm64 olddefconfig
 
