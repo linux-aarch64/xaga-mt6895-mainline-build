@@ -116,10 +116,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-           kernel/.config
-           kernel/arch/arm64/boot
-           kernel/**/*.o
-           kernel/**/*.a
+            kernel/.config
+            kernel/arch/arm64/boot
+            kernel/**/*.o
+            kernel/**/*.a
            key: kernel-clang-${{ env.KERNEL_BRANCH }}-${{ github.sha }}
            restore-keys: |
             kernel-clang-${{ env.KERNEL_BRANCH }}-
