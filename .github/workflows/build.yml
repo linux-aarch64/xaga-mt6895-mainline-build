@@ -120,8 +120,8 @@ jobs:
             kernel/arch/arm64/boot
             kernel/**/*.o
             kernel/**/*.a
-           key: kernel-clang-${{ env.KERNEL_BRANCH }}-${{ github.sha }}
-           restore-keys: |
+          key: kernel-clang-${{ env.KERNEL_BRANCH }}-${{ github.sha }}
+          restore-keys: |
             kernel-clang-${{ env.KERNEL_BRANCH }}-
 
       - name: 拉取主线内核源码，检出蓝牙/触控/Panthor全套修复commit
