@@ -146,19 +146,19 @@ jobs:
           # 合并xaga.config
           ARCH=arm64 ./scripts/kconfig/merge_config.sh arch/arm64/configs/defconfig arch/arm64/configs/xaga.config
           
-          ./scripts/config --set-val CONFIG_BLK_DEV_LOOP y
-          ./scripts/config --set-val CONFIG_F2FS_FS y
-          ./scripts/config --set-val CONFIG_F2FS_FS_SECURITY y
+          #./scripts/config --set-val CONFIG_BLK_DEV_LOOP y
+          #./scripts/config --set-val CONFIG_F2FS_FS y
+          #./scripts/config --set-val CONFIG_F2FS_FS_SECURITY y
           # 关闭 CONFIG_WERROR，避免驱动警告导致编译失败
-          ./scripts/config --disable CONFIG_WERROR
+          #./scripts/config --disable CONFIG_WERROR
           # 关闭 komeda 显示模块(似乎是用不上?)
-          ./scripts/config --disable CONFIG_DRM_KOMEDA
+          #./scripts/config --disable CONFIG_DRM_KOMEDA
 
           # 补上缺失的音频和面板配置
-          ./scripts/config --set-val CONFIG_DRM_MEDIATEK y
-          ./scripts/config --set-val CONFIG_MTK_DRM_PANEL y
-          ./scripts/config --set-val CONFIG_MTK_DISP_DDIC y
-          ./scripts/config --set-val CONFIG_MTK_DISP_DRIVER y
+          #./scripts/config --set-val CONFIG_DRM_MEDIATEK y
+          #./scripts/config --set-val CONFIG_MTK_DRM_PANEL y
+          #./scripts/config --set-val CONFIG_MTK_DISP_DDIC y
+          #./scripts/config --set-val CONFIG_MTK_DISP_DRIVER y
           
           make ARCH=arm64 olddefconfig
 
