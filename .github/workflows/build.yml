@@ -143,11 +143,8 @@ jobs:
       - name: 加载平台 defconfig + 开启 Loop/F2FS
         working-directory: kernel
         run: |
-          # 加载基础配置
-          make ARCH=arm64 defconfig
-
           # 合并xaga.config
-          ./scripts/kconfig/merge_config.sh .config arch/arm64/configs/xaga.config
+          ARCH=arm64 ./scripts/kconfig/merge_config.sh arch/arm64/configs/defconfig arch/arm64/configs/xaga.config
           
           ./scripts/config --set-val CONFIG_BLK_DEV_LOOP y
           ./scripts/config --set-val CONFIG_F2FS_FS y
@@ -171,7 +168,7 @@ jobs:
           make -j$(nproc) ARCH=arm64 \
             CC=clang-${{ inputs.CLANG_VERSION }} \
             LD=ld.lld-${{ inputs.CLANG_VERSION }} \
-            LLVM=1 LLVM_IAS=1
+            LLVM=1 
           # Image + DTB 拼接，绕过原厂LK dtbo限制
           cat arch/arm64/boot/Image arch/arm64/boot/dts/mediatek/mt6895-xiaomi-xaga.dtb > Image_with_dtb
           hexdump -C Image_with_dtb | grep d00dfeed
