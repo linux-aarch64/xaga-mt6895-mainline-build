@@ -80,7 +80,7 @@ jobs:
           wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
           echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${{ inputs.CLANG_VERSION }} main" | sudo tee /etc/apt/sources.list.d/llvm.list
           sudo apt update
-          sudo apt install -y clang-${{ inputs.CLANG_VERSION }} llvm-${{ inputs.CLANG_VERSION }} lld-${{ inputs.CLANG_VERSION }} llvm-objdump
+          sudo apt install -y clang-${{ inputs.CLANG_VERSION }} llvm-${{ inputs.CLANG_VERSION }} lld-${{ inputs.CLANG_VERSION }}
           # 创建不带版本后缀符号链接，修复 LLVM=1 模式下各类工具 not found
           CLANG_VER=${{ inputs.CLANG_VERSION }}
           sudo ln -sf /usr/bin/clang-${CLANG_VER} /usr/bin/clang
