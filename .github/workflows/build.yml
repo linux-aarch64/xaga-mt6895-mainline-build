@@ -183,7 +183,7 @@ jobs:
             --os_patch_level 2026-08 \  
             -o boot.img
             
-     - name: 上传内核编译产物
+      - name: 上传内核编译产物
         uses: actions/upload-artifact@v4
         with:
           name: kernel-output
