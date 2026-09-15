@@ -296,7 +296,7 @@ jobs:
           mkfs.ext4 -F rootfs.img
           mkdir -p rootfs_mnt
           sudo mount -o loop rootfs.img rootfs_mnt
-          debootstrap --arch=arm64 ${DEBIAN_VER} rootfs_mnt https://deb.debian.org/debian/
+          debootstrap --arch=arm64 "${DEBIAN_VER}" rootfs_mnt https://deb.debian.org/debian/
           sudo umount rootfs_mnt
           rmdir rootfs_mnt
 
