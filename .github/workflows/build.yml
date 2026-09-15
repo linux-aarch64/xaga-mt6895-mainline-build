@@ -75,7 +75,7 @@ jobs:
           sudo apt update -y
           sudo apt install -y --no-install-recommends \
             build-essential bison flex libelf-dev libssl-dev cpio lz4 wget git ccache \
-            device-tree-compiler f2fs-tools util-linux gzip
+            device-tree-compiler f2fs-tools util-linux gzip gcc-aarch64-linux-gnu
           # 添加 LLVM 官方源
           wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
           echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${{ inputs.CLANG_VERSION }} main" | sudo tee /etc/apt/sources.list.d/llvm.list
