@@ -50,8 +50,8 @@ on:
         default: "Trixie"
         type: choice
         options:
-          - "Trixie"
-          - "Bookworm"
+          - "trixie"
+          - "bookworm"
       ENABLE_NOTIFY:
         description: "开启构建通知"
         required: false
@@ -292,12 +292,11 @@ jobs:
         if: ${{ inputs.ROOTFS_TYPE == 'Debian' }}
         run: |
           DEDIAN_VER="${{ inputs.DEDIAN_VERSION }}"
-          URL="https://deb.debian.org/debian"
           dd if=/dev/zero of=rootfs.img bs=1M count=4096 status=progress
           mkfs.ext4 -F rootfs.img
           mkdir -p rootfs_mnt
           sudo mount -o loop rootfs.img rootfs_mnt
-          debootstrap --arch=arm64 ${DEBIAN_VER} rootfs_mnt ${URL}
+          debootstrap --arch=arm64 ${DEBIAN_VER} rootfs_mnt https://deb.debian.org/debian
           sudo umount rootfs_mnt
           rmdir rootfs_mnt
 
