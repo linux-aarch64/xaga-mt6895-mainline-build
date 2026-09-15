@@ -11,6 +11,11 @@ on:
           - "仅编译内核"
           - "仅构建RootFS"
           - "全部(内核+RootFS)"
+      CLANG_VERSION:
+        description: "LLVM Clang编译版本"
+        required: true
+        default: "19"
+        type: string
       ROOTFS_TYPE:
         description: "RootFS发行版(仅RootFS任务生效)"
         required: true
@@ -30,11 +35,6 @@ on:
           - "phosh"
           - "none"
           - "plasma-mobile"
-      CLANG_VERSION:
-        description: "LLVM Clang编译版本"
-        required: true
-        default: "19"
-        type: string
       UBUNTU_VERSION:
         description: "Ubuntu版本(仅Ubuntu RootFS生效)"
         required: true
@@ -52,6 +52,11 @@ on:
         options:
           - "Trixie"
           - "Bookworm"
+      ENABLE_NOTIFY:
+        description: "开启构建通知"
+        required: false
+        default: true
+        type: boolean
 
 env:
   KERNEL_REPO: "MT6895-Mainline/linux"
@@ -307,7 +312,7 @@ jobs:
             rootfs.img
 
   # ============================================================
-  # Job 3: 编译完成通知 (钉钉 / Server酱)
+  # Job 3: 编译完成通知
   # ============================================================
   notify:
     name: 发送构建通知
