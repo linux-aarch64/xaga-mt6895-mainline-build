@@ -53,7 +53,7 @@ env:
   KERNEL_REPO: "MT6895-Mainline/linux"
   KERNEL_BRANCH: "7.2-mt6895-xiaomi-xaga"
   INITRAMFS_REPO: "MT6895-Mainline/initramfs"
-  PHYSICAL_ROOT_PART: "/dev/mmcblk0p86"
+  PHYSICAL_ROOT_PART: "/dev/sdc86"
   LOOP_IMG_PATH: "/pmos/rootfs.img"
   CCACHE_MAXSIZE: "2G"
 
@@ -75,7 +75,7 @@ jobs:
           sudo apt update -y
           sudo apt install -y --no-install-recommends \
             build-essential bison flex libelf-dev libssl-dev cpio lz4 wget git ccache \
-            device-tree-compiler f2fs-tools util-linux
+            device-tree-compiler f2fs-tools util-linux gzip
           # 添加 LLVM 官方源
           wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
           echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${{ inputs.CLANG_VERSION }} main" | sudo tee /etc/apt/sources.list.d/llvm.list
@@ -101,12 +101,11 @@ jobs:
           ccache -M ${CCACHE_MAXSIZE}
           ccache -z
 
-      - name: 安装 osm0sis mkbootimg (C源码, 去掉‑Werror兼容新GCC)
+      - name: 安装 osm0sis mkbootimg (C源码, 用Clang编译避免错误)
         run: |
           git clone --depth=1 https://github.com/osm0sis/mkbootimg.git
           cd mkbootimg
-          sed -i 's/-Werror//g' Makefile libmincrypt/Makefile
-          make
+          make CC=clang all
           sudo cp mkbootimg /usr/local/bin/
           sudo chmod +x /usr/local/bin/mkbootimg
           mkbootimg 2>&1 | head -3
@@ -131,34 +130,20 @@ jobs:
           fi
           cd kernel
           git fetch origin
-          git checkout 4fadce8d6bbce016a8965ad93a5285c565401c1d
+          git checkout 7.2-mt6895-xiaomi-xaga
 
       - name: 拉取项目专用 initramfs，检出蓝牙配套修复commit
         run: |
           git clone https://github.com/${{ env.INITRAMFS_REPO }}.git initramfs
           cd initramfs
           git fetch origin
-          git checkout 126b0c137338c1ec6a2cbc434bd67239ce2e38c7
+          git checkout xaga-mt6895
 
-      - name: 加载平台 defconfig + 开启 Loop/F2FS
+      - name: 加载平台 defconfig + 合并xaga.config
         working-directory: kernel
         run: |
           # 合并xaga.config
           ARCH=arm64 ./scripts/kconfig/merge_config.sh arch/arm64/configs/defconfig arch/arm64/configs/xaga.config
-          
-          #./scripts/config --set-val CONFIG_BLK_DEV_LOOP y
-          #./scripts/config --set-val CONFIG_F2FS_FS y
-          #./scripts/config --set-val CONFIG_F2FS_FS_SECURITY y
-          # 关闭 CONFIG_WERROR，避免驱动警告导致编译失败
-          #./scripts/config --disable CONFIG_WERROR
-          # 关闭 komeda 显示模块(似乎是用不上?)
-          #./scripts/config --disable CONFIG_DRM_KOMEDA
-
-          # 补上缺失的音频和面板配置
-          #./scripts/config --set-val CONFIG_DRM_MEDIATEK y
-          #./scripts/config --set-val CONFIG_MTK_DRM_PANEL y
-          #./scripts/config --set-val CONFIG_MTK_DISP_DDIC y
-          #./scripts/config --set-val CONFIG_MTK_DISP_DRIVER y
           
           make ARCH=arm64 olddefconfig
 
@@ -168,34 +153,44 @@ jobs:
           make -j$(nproc) ARCH=arm64 \
             CC=clang-${{ inputs.CLANG_VERSION }} \
             LD=ld.lld-${{ inputs.CLANG_VERSION }} \
-            LLVM=1 
+            LLVM=1 Image
           # Image + DTB 拼接，绕过原厂LK dtbo限制
           cat arch/arm64/boot/Image arch/arm64/boot/dts/mediatek/mt6895-xiaomi-xaga.dtb > Image_with_dtb
-          hexdump -C Image_with_dtb | grep d00dfeed
+
+          # gzip压缩拼接后的镜像
+          gzip -n -9 -c Image_with_dtb > Image.gz
 
       - name: 编译 initramfs (物理分区版)
         working-directory: initramfs
         run: |
           make clean
-          make BOOT_PARTITION=${{ env.PHYSICAL_ROOT_PART }}
-          cp initramfs.cpio.lz4 ../initramfs-physical.cpio.lz4
+          make 
+          cp initramfs.cpio.lz4 ../initramfs.cpio.lz4
 
-      - name: 打包 boot‑physical.img，cmdline适配6+128内存
+      - name: 打包 boot.img
         run: |
           mkbootimg \
-            --kernel kernel/Image_with_dtb \
-            --ramdisk initramfs-physical.cpio.lz4 \
-            --cmdline "earlycon=0x11200000,115200 root=${{ env.PHYSICAL_ROOT_PART }} rootfstype=ext4 loglevel=7 PMOS_NOSPLASH mem=6G" \
-            -o boot-physical.img
-
-      - name: 上传内核编译产物
+            --kernel kernel/Image.gz \
+            --ramdisk initramfs.cpio.lz4 \
+            --base 0x3fff8000 \  
+            --kernel_offset 0x8000 \   
+            --pagesize 4096 \
+            --ramdisk_offset 0x26f08000 \
+            --tags_offset 0x07c88000 \
+            --dtb_offset 0x07c88000 \
+            --header_version 4 \
+            --os_version 16.0.0 \
+            --os_patch_level 2026-08 \  
+            -o boot.img
+            
+     - name: 上传内核编译产物
         uses: actions/upload-artifact@v4
         with:
           name: kernel-output
           path: |
-            boot-physical.img
-            kernel/Image_with_dtb
-            initramfs-physical.cpio.lz4
+            boot.img
+            kernel/Image.gz
+            initramfs.cpio.lz4
 
   # ============================================================
   # Job 2: 构建 RootFS (postmarketOS / Arch Linux ARM / Ubuntu)
