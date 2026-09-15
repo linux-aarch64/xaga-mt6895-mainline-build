@@ -44,7 +44,7 @@ xaga-mt6895-mainline-build/
 ### 2. 下载产物
 
 构建成功后, 在任务页面底部 **Artifacts** 下载:
-- `kernel-output`: `boot-physical.img` + `Image_with_dtb` + `initramfs-physical.cpio.lz4`
+- `kernel-output`: `boot.img` + `Image_with_dtb` + `initramfs.cpio.lz4`
 - `rootfs-output`: `rootfs.img` (ext4 根文件系统镜像)
 
 ### 3. 刷写
