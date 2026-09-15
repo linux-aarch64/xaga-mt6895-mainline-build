@@ -172,15 +172,15 @@ jobs:
           mkbootimg \
             --kernel kernel/Image.gz \
             --ramdisk initramfs.cpio.lz4 \
-            --base 0x3fff8000 \  
-            --kernel_offset 0x8000 \   
+            --base 0x3fff8000 \
+            --kernel_offset 0x8000 \
             --pagesize 4096 \
             --ramdisk_offset 0x26f08000 \
             --tags_offset 0x07c88000 \
             --dtb_offset 0x07c88000 \
             --header_version 4 \
             --os_version 16.0.0 \
-            --os_patch_level 2026-08 \  
+            --os_patch_level 2026-08 \
             -o boot.img
             
       - name: 上传内核编译产物
