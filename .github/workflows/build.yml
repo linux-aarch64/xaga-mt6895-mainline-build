@@ -47,7 +47,7 @@ on:
       DEDIAN_VERSION:
         description: "Debian版本(仅Debian RootFS生效)"
         required: true
-        default: "Trixie"
+        default: "trixie"
         type: choice
         options:
           - "trixie"
@@ -85,11 +85,11 @@ jobs:
           sudo apt install -y --no-install-recommends \
             build-essential bison flex libelf-dev libssl-dev cpio lz4 wget git ccache \
             device-tree-compiler f2fs-tools util-linux gzip gcc-aarch64-linux-gnu
-          # 添加 LLVM 官方源
-          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
-          echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${{ inputs.CLANG_VERSION }} main" | sudo tee /etc/apt/sources.list.d/llvm.list
+
+          # 安装 LLVM 相关工具链
           sudo apt update
           sudo apt install -y clang-${{ inputs.CLANG_VERSION }} llvm-${{ inputs.CLANG_VERSION }} lld-${{ inputs.CLANG_VERSION }}
+          
           # 创建不带版本后缀符号链接，修复 LLVM=1 模式下各类工具 not found
           CLANG_VER=${{ inputs.CLANG_VERSION }}
           sudo ln -sf /usr/bin/clang-${CLANG_VER} /usr/bin/clang
@@ -101,12 +101,14 @@ jobs:
           sudo ln -sf /usr/bin/llvm-objcopy-${CLANG_VER} /usr/bin/llvm-objcopy
           sudo ln -sf /usr/bin/llvm-readelf-${CLANG_VER} /usr/bin/llvm-readelf
           sudo ln -sf /usr/bin/llvm-strip-${CLANG_VER} /usr/bin/llvm-strip
+          sudo ln -sf /usr/bin/llvm-objdump-${CLANG_VER} /usr/bin/llvm-objdump
           # 全部工具校验
           llvm-ar --version
           llvm-nm --version
           llvm-objcopy --version
           llvm-readelf --version
           llvm-strip --version
+          llvm-objdump --version
           ccache -M ${CCACHE_MAXSIZE}
           ccache -z
 
@@ -291,12 +293,13 @@ jobs:
       - name: 构建 Debian arm64 rootfs
         if: ${{ inputs.ROOTFS_TYPE == 'Debian' }}
         run: |
+          PACKAGE_URL="https://deb.debian.org"
           DEDIAN_VER="${{ inputs.DEDIAN_VERSION }}"
           dd if=/dev/zero of=rootfs.img bs=1M count=4096 status=progress
           mkfs.ext4 -F rootfs.img
           mkdir -p rootfs_mnt
           sudo mount -o loop rootfs.img rootfs_mnt
-          debootstrap --arch=arm64 ${DEBIAN_VER} rootfs_mnt https://deb.debian.org/debian
+          debootstrap --arch=arm64 ${DEBIAN_VER} rootfs_mnt ${PACKAGE_URL}
           sudo umount rootfs_mnt
           rmdir rootfs_mnt
 
