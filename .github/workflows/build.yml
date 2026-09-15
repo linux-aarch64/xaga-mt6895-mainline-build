@@ -20,6 +20,7 @@ on:
           - "postmarketOS"
           - "Arch Linux ARM"
           - "Ubuntu"
+          - "Debian"
       PMOS_UI:
         description: "postmarketOS桌面环境(仅pmos生效)"
         required: false
@@ -43,11 +44,14 @@ on:
           - "26.04 LTS"
           - "25.10"
           - "24.04 LTS"
-      ENABLE_NOTIFY:
-        description: "开启钉钉/Server酱构建通知"
-        required: false
-        default: true
-        type: boolean
+      DEDIAN_VERSION:
+        description: "Debian版本(仅Debian RootFS生效)"
+        required: true
+        default: "Trixie"
+        type: choice
+        options:
+          - "Trixie"
+          - "Bookworm"
 
 env:
   KERNEL_REPO: "MT6895-Mainline/linux"
@@ -253,6 +257,10 @@ jobs:
           sudo umount rootfs_mnt
           rmdir rootfs_mnt
 
+          # 修正大小
+          e2fsck -p -f rootfs.img
+          resize2fs -M rootfs.img
+
       - name: 构建 Ubuntu rootfs (动态版本探测)
         if: ${{ inputs.ROOTFS_TYPE == 'Ubuntu' }}
         run: |
@@ -271,6 +279,25 @@ jobs:
           sudo umount rootfs_mnt
           rmdir rootfs_mnt
 
+          # 修正大小
+          e2fsck -p -f rootfs.img
+          resize2fs -M rootfs.img
+
+      - name: 构建 Debian arm64 rootfs
+        if: ${{ inputs.ROOTFS_TYPE == 'Debian' }}
+        run: |
+          dd if=/dev/zero of=rootfs.img bs=1M count=4096 status=progress
+          mkfs.ext4 -F rootfs.img
+          mkdir -p rootfs_mnt
+          sudo mount -o loop rootfs.img rootfs_mnt
+          debootstrap --arch=arm64 stable rootfs_mnt http://deb.debian.org/debian/
+          sudo umount rootfs_mnt
+          rmdir rootfs_mnt
+
+          # 修正大小
+          e2fsck -p -f rootfs.img
+          resize2fs -M rootfs.img
+          
       - name: 上传 RootFS 产物
         uses: actions/upload-artifact@v4
         with:
@@ -304,15 +331,3 @@ jobs:
             overall="failure"
           fi
           echo "result=${overall}" >> $GITHUB_OUTPUT
-
-      - name: 调用 bot.py 发送通知
-        env:
-          DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}
-          DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}
-          SERVERCHAN_KEY: ${{ secrets.SERVERCHAN_KEY }}
-        run: |
-          pip3 install --quiet requests 2>/dev/null || true
-          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          python3 bot.py --notify \
-            --status ${{ steps.status.outputs.result }} \
-            --artifact-url "$RUN_URL"
