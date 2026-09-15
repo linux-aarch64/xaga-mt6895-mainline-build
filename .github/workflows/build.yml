@@ -32,7 +32,7 @@ on:
       CLANG_VERSION:
         description: "LLVM Clang编译版本"
         required: true
-        default: "18"
+        default: "19"
         type: string
       UBUNTU_VERSION:
         description: "Ubuntu版本(仅Ubuntu RootFS生效)"
