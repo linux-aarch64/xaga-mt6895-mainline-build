@@ -21,12 +21,10 @@ xaga-mt6895-mainline-build/
 
 | 功能 | 说明 |
 |------|------|
-| Clang 全链路编译 | LLVM=1 LLVM_IAS=1, 作者强制规范, 禁用 GCC |
+| Clang 全链路编译 | LLVM=1, 作者强制规范, 禁用 GCC |
 | Image+DTB 拼接 | 绕过原厂 LK dtbo 限制 |
-| 项目专用 initramfs | 使用 MT6895-Mainline/initramfs, 替代 pmbootstrap initramfs |
+| 项目专用 initramfs | 使用 MT6895-Mainline/initramfs|
 | 多发行版 RootFS | postmarketOS / Arch Linux ARM / Ubuntu 三选一 |
-| 双系统 Loop 支持 | 内核已开启 CONFIG_BLK_DEV_LOOP + F2FS |
-| 编译缓存加速 | actions/cache 缓存内核 obj, 二次构建提速 60%+ |
 | 钉钉/QQ 通知 | 构建完成自动推送 (钉钉 Webhook / Server酱) |
 | 上游更新监控 | bot.py 自动检测上游内核 commit, 可自动触发构建 |
 
@@ -53,15 +51,15 @@ xaga-mt6895-mainline-build/
 
 ```bash
 # 刷内核 (boot 分区)
-fastboot flash boot boot-physical.img
+fastboot flash boot boot.img
 
-# 刷 RootFS (userdata 分区, 会清空安卓数据!)
+# 刷 RootFS (userdata 分区, 注意会清空安卓数据!)
 fastboot flash userdata rootfs.img
 
 fastboot reboot
 ```
 
-> userdata 物理分区已确认为 `/dev/mmcblk0p86` (主线内核命名), cmdline 已内置。
+> userdata 物理分区已确认为 `/dev/sdc86` (主线内核命名), cmdline 已内置。
 
 ### 4. 清理缓存
 
@@ -123,15 +121,15 @@ on:
 | 环境 | 设备名 |
 |------|--------|
 | Android (原厂内核) | `/dev/sdc86` |
-| 主线内核 (MT6895-mainline) | `/dev/mmcblk0p86` |
+| 主线内核 (MT6895-mainline) | `/dev/sdc86` |
 
-> 分区号数字不变, 仅磁盘前缀因驱动不同而变化。cmdline 中使用主线内核命名 `/dev/mmcblk0p86`。
+> 分区号数字不变, userdata对应分区编号为/dev/sdc86。cmdline 中使用主线内核命名 `/dev/sdc86`。
 
 ## 注意事项
 
 1. **必须解锁 Bootloader** 才能刷入自定义 boot.img
 2. `fastboot flash userdata` 会彻底清除安卓用户数据, 操作前务必备份
-3. 官方 initramfs 当前原生仅支持物理分区挂载, Loop 双系统需自行修改 init.c
+3. 官方 initramfs 当前原生仅支持物理分区挂载, 
 4. 首次进入 postmarketOS 后执行 `sudo apk add linux-firmware-mediatek` 补全固件
 5. 救砖: fastboot 刷回原厂 boot.img; 若 userdata 已覆盖需 MiFlash 线刷整机
 
