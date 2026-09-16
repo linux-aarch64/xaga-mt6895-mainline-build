@@ -169,7 +169,7 @@ jobs:
           # cat arch/arm64/boot/Image arch/arm64/boot/dts/mediatek/mt6895-xiaomi-xaga.dtb > Image_with_dtb
 
           # gzip压缩拼接后的镜像
-          gzip -n -9 -c Image_with_dtb > Image.gz
+          # gzip -n -9 -c Image_with_dtb > Image.gz
           gzip -n -9 -c arch/arm64/boot/Image > Image.gz
           
       - name: 编译 initramfs (物理分区版)
