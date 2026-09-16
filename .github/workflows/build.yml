@@ -299,7 +299,9 @@ jobs:
           mkfs.ext4 -F rootfs.img
           mkdir -p rootfs_mnt
           sudo mount -o loop rootfs.img rootfs_mnt
-          sudo debootstrap --arch=arm64 ${DEBIAN_VER} ${PACKAGE_URL} rootfs_mnt
+          mkdir -p rootfs_mnt/bin
+          sudo cp /bin/qemu-aarch64-static rootfs_mnt/bin
+          sudo debootstrap --arch=arm64 ${DEBIAN_VER} rootfs_mnt ${PACKAGE_URL}
           sudo umount rootfs_mnt
           rmdir rootfs_mnt
 
