@@ -63,56 +63,7 @@ fastboot reboot
 
 ### 4. 清理缓存
 
-当编译异常或缓存冲突时, Actions → **Clean Cache** → Run workflow, 一键清空全部缓存。
-
-## Secrets 配置 (通知功能)
-
-仓库 → Settings → Secrets and variables → Actions → New repository secret:
-
-| Secret 名称 | 说明 | 是否必需 |
-|-------------|------|----------|
-| `DINGTALK_WEBHOOK` | 钉钉机器人 Webhook 完整地址 | 可选 |
-| `DINGTALK_SECRET` | 钉钉机器人加签密钥 | 可选 |
-| `SERVERCHAN_KEY` | Server酱 SendKey (sct开头, 推微信/QQ) | 可选 |
-
-> `GITHUB_TOKEN` 由 Actions 自动注入, 无需手动配置。
-
-### 钉钉机器人配置
-
-1. 钉钉群 → 智能群助手 → 添加机器人 → 自定义
-2. 安全设置选择 **加签**, 复制密钥填入 `DINGTALK_SECRET`
-3. 复制 Webhook 地址填入 `DINGTALK_WEBHOOK`
-
-### Server酱配置
-
-1. 访问 [sct.ftqq.com](https://sct.ftqq.com), 微信扫码登录
-2. 复制 SendKey 填入 `SERVERCHAN_KEY`
-3. 可在 Server酱后台绑定 QQ 推送通道
-
-## bot.py 用法
-
-```bash
-# 发送构建通知 (Actions 中自动调用)
-python3 bot.py --notify --status success --artifact-url <构建记录URL>
-
-# 检测上游内核更新
-python3 bot.py --check-update
-
-# 检测更新并自动触发构建
-python3 bot.py --check-update --auto-build
-
-# 检测更新, 提交补丁记录并触发构建
-python3 bot.py --check-update --auto-build --commit-patch
-```
-
-可配合定时任务 (schedule) 实现每日自动检测上游更新:
-
-```yaml
-# 在 Build.yml 中追加
-on:
-  schedule:
-    - cron: '0 0 * * *'  # 每天 UTC 00:00 检测
-```
+当编译异常或缓存冲突时, Actions → **Clean Cache** → Run workflow, 一键清空全部缓存
 
 ## 分区确认
 
@@ -129,7 +80,7 @@ on:
 
 1. **必须解锁 Bootloader** 才能刷入自定义 boot.img
 2. `fastboot flash userdata` 会彻底清除安卓用户数据, 操作前务必备份
-3. 官方 initramfs 当前原生仅支持物理分区挂载, 
+3. 官方 initramfs 当前原生仅支持物理分区挂载,
 4. 首次进入 postmarketOS 后执行 `sudo apk add linux-firmware-mediatek` 补全固件
 5. 救砖: fastboot 刷回原厂 boot.img; 若 userdata 已覆盖需 MiFlash 线刷整机
 
@@ -137,6 +88,6 @@ on:
 
 - 编译: Clang-18 / LLVM / LLD (全 LLVM 工具链)
 - 打包: osm0sis mkbootimg (兼容 MTK 原厂 LK)
-- RootFS: postmarketOS edge / Arch Linux ARM / Ubuntu 24.04 base
+- RootFS: postmarketOS edge / Arch Linux ARM / Ubuntu 24.04 / Debian 13
 - 通知: 钉钉 Webhook (加签) / Server酱
 - 缓存: actions/cache (内核 obj + RootFS 镜像)
