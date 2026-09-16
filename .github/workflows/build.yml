@@ -215,7 +215,7 @@ jobs:
       - name: 安装依赖
         run: |
           sudo apt update -y
-          sudo apt install -y --no-install-recommends wget git e2fsprogs util-linux qemu-user-static debootstrap
+          sudo apt install -y --no-install-recommends wget git e2fsprogs util-linux qemu-user-static debootstrap zstd
 
       # ============ 调试阶段注释cache，节约存储 ============
       # - name: RootFS 缓存
