@@ -22,11 +22,9 @@ xaga-mt6895-mainline-build/
 | 功能 | 说明 |
 |------|------|
 | Clang 全链路编译 | LLVM=1, 作者强制规范, 禁用 GCC |
-| Image+DTB 拼接 | 绕过原厂 LK dtbo 限制 |
+| Image内置dtb | 绕过原厂 LK dtbo 限制 |
 | 项目专用 initramfs | 使用 MT6895-Mainline/initramfs|
-| 多发行版 RootFS | postmarketOS / Arch Linux ARM / Ubuntu 三选一 |
-| 钉钉/QQ 通知 | 构建完成自动推送 (钉钉 Webhook / Server酱) |
-| 上游更新监控 | bot.py 自动检测上游内核 commit, 可自动触发构建 |
+| 多发行版 RootFS | postmarketOS / Arch Linux ARM / Ubuntu / Debian四选一 |
 
 ## 使用方法
 
@@ -37,9 +35,9 @@ xaga-mt6895-mainline-build/
 | 参数 | 选项 | 说明 |
 |------|------|------|
 | 构建任务类型 | 仅编译内核 / 仅构建RootFS / 全部 | 选择要执行的任务 |
-| RootFS发行版 | postmarketOS / Arch Linux ARM / Ubuntu | 仅 RootFS 任务生效 |
+| RootFS发行版 | postmarketOS / Arch Linux ARM / Ubuntu / Debian | 仅 RootFS 任务生效 |
 | postmarketOS桌面 | phosh / none / plasma-mobile | 仅 pmOS 生效 |
-| Clang版本 | 默认 18 | LLVM 编译版本 |
+| Clang版本 | 默认 19 | LLVM 编译版本 |
 
 ### 2. 下载产物
 
@@ -50,6 +48,9 @@ xaga-mt6895-mainline-build/
 ### 3. 刷写
 
 ```bash
+# 刷特定lk（lk 分区）
+fastboot flash lk lk.img
+
 # 刷内核 (boot 分区)
 fastboot flash boot boot.img
 
@@ -89,5 +90,3 @@ fastboot reboot
 - 编译: Clang-18 / LLVM / LLD (全 LLVM 工具链)
 - 打包: osm0sis mkbootimg (兼容 MTK 原厂 LK)
 - RootFS: postmarketOS edge / Arch Linux ARM / Ubuntu 24.04 / Debian 13
-- 通知: 钉钉 Webhook (加签) / Server酱
-- 缓存: actions/cache (内核 obj + RootFS 镜像)
