@@ -13,7 +13,6 @@ xaga-mt6895-mainline-build/
 │   └── workflows/
 │       ├── build.yml    # 主编译工作流 (内核编译 + RootFS构建 + 完成通知)
 │       └── clean.yml    # 缓存清理工作流
-├── bot.py               # 自动化助手 (钉钉/Server酱通知 + 上游更新检测 + 自动触发构建)
 └── README.md
 ```
 
@@ -84,6 +83,7 @@ fastboot reboot
 3. 官方 initramfs 当前原生仅支持物理分区挂载,
 4. 首次进入 postmarketOS 后执行 `sudo apk add linux-firmware-mediatek` 补全固件
 5. 救砖: fastboot 刷回原厂 boot.img; 若 userdata 已覆盖需 MiFlash 线刷整机
+6. 需要刷入特定lk,主线Linux基于特定lk开发.否则，可能会启动失败
 
 ## 技术栈
 
