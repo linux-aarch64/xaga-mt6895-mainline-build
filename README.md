@@ -85,7 +85,7 @@ fastboot reboot
 4. 首次进入 postmarketOS 后执行 `sudo apk add linux-firmware-mediatek` 补全固件
 5. 救砖: fastboot 刷回原厂 boot.img; 若 userdata 已覆盖需 MiFlash 线刷整机
 6. 需要刷入特定lk,主线Linux基于特定lk开发.否则，可能会启动失败
-7. lk 需要对应类原生的vendor_boot,dtbo.以适配主线Linux的启动环境
+7. lk 需要类原生的vendor_boot,dtbo.以适配主线Linux的启动环境
 
 ## 技术栈
 
