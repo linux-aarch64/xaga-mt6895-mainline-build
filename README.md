@@ -21,6 +21,7 @@ xaga-mt6895-mainline-build/
 | 功能 | 说明 |
 |------|------|
 | Clang 全链路编译 | LLVM=1, 作者强制规范, 禁用 GCC |
+| 内核内置驱动 | 无需额外编译modules |
 | Image内置dtb | 绕过原厂 LK dtbo 限制 |
 | 项目专用 initramfs | 使用 MT6895-Mainline/initramfs|
 | 多发行版 RootFS | postmarketOS / Arch Linux ARM / Ubuntu / Debian四选一 |
@@ -84,6 +85,7 @@ fastboot reboot
 4. 首次进入 postmarketOS 后执行 `sudo apk add linux-firmware-mediatek` 补全固件
 5. 救砖: fastboot 刷回原厂 boot.img; 若 userdata 已覆盖需 MiFlash 线刷整机
 6. 需要刷入特定lk,主线Linux基于特定lk开发.否则，可能会启动失败
+7. lk 需要对应类原生的vendor_boot,dtbo.以适配主线Linux的启动环境
 
 ## 技术栈
 
