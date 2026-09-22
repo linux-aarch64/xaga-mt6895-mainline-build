@@ -178,7 +178,7 @@ jobs:
 
       - name: 打包 boot.img
         run: |
-          mkbootimage --kernel "kernel/Image.gz" \
+          mkbootimg --kernel "kernel/Image.gz" \
           --ramdisk "initramfs.coio.lz4" \
           --base 0x3fff8000 \
           --kernel_offset 0x8000 \
