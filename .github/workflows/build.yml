@@ -156,17 +156,15 @@ jobs:
           # 合并xaga.config
           ARCH=arm64 ./scripts/kconfig/merge_config.sh arch/arm64/configs/defconfig arch/arm64/configs/xaga.config
           
-          make ARCH=arm64 olddefconfig
+          make ARCH=arm64 LLVM=1 olddefconfig
 
       - name: 全 LLVM 编译内核 (作者强制规范)
         working-directory: kernel
         run: |
-          make -j$(nproc) ARCH=arm64 \
+          make -j$(nproc) ARCH=arm64 LLVM=1 \
             CC=clang-${{ inputs.CLANG_VERSION }} \
             LD=ld.lld-${{ inputs.CLANG_VERSION }} \
-            LLVM=1 Image
-          # Image + DTB 拼接，绕过原厂LK dtbo限制
-          # cat arch/arm64/boot/Image arch/arm64/boot/dts/mediatek/mt6895-xiaomi-xaga.dtb > Image_with_dtb
+            Image
 
           # gzip压缩镜像
           gzip -n -9 -c arch/arm64/boot/Image > Image.gz
