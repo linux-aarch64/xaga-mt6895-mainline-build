@@ -181,7 +181,7 @@ jobs:
       - name: 打包 boot.img
         run: |
           mkbootimg --kernel "kernel/Image.gz" \
-          --ramdisk "initramfs.coio.lz4" \
+          --ramdisk "initramfs.cpio.lz4" \
           --base 0x3fff8000 \
           --kernel_offset 0x8000 \
           --pagesize 4096 \
