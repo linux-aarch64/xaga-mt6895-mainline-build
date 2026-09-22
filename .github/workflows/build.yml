@@ -158,6 +158,8 @@ jobs:
           
           make ARCH=arm64 LLVM=1 olddefconfig
 
+          ./scripts/config --set-val CONFIG_RD_LZ4 y
+
       - name: 全 LLVM 编译内核 (作者强制规范)
         working-directory: kernel
         run: |
